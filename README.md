@@ -1,26 +1,46 @@
 # gradle-git-version
 
-Git 标签驱动的 Android 版本管理工具。
+[![](https://jitpack.io/v/bgColorGray/gradle-git-version.svg)](https://jitpack.io/#bgColorGray/gradle-git-version)
+
+Git 标签驱动的 Android/Gradle 版本管理工具。
 
 ## 特性
 
 - 从 Git 标签自动获取 `versionName`
-- 自动计算 `versionCode` (major * 10000 + minor * 100 + patch)
+- 自动计算 `versionCode` (major × 10000 + minor × 100 + patch)
 - 支持开发版本标识 (如 `1.0.0-dev.5+abc123`)
 - 构建时打印版本信息
 
-## 使用方法
+## 安装
 
-### 1. 复制 buildSrc 目录
+### Step 1. 添加 JitPack 仓库
 
-将 `buildSrc/` 目录复制到你的 Android 项目根目录：
-
-```bash
-cp -r buildSrc /path/to/your/android/project/
+**settings.gradle.kts**
+```kotlin
+dependencyResolutionManagement {
+    repositories {
+        maven { url = uri("https://jitpack.io") }
+    }
+}
 ```
 
-### 2. 在 app/build.gradle.kts 中使用
+### Step 2. 添加依赖
 
+**根目录 build.gradle.kts**
+```kotlin
+buildscript {
+    repositories {
+        maven { url = uri("https://jitpack.io") }
+    }
+    dependencies {
+        classpath("com.github.bgColorGray:gradle-git-version:1.0.0")
+    }
+}
+```
+
+### Step 3. 在 app 模块中使用
+
+**app/build.gradle.kts**
 ```kotlin
 // 打印版本信息
 GitVersions.printVersionInfo(rootDir)
@@ -30,21 +50,16 @@ android {
         versionCode = GitVersions.getVersionCode(rootDir)
         versionName = GitVersions.getVersion(rootDir)
 
-        // 可选：添加 BuildConfig 字段供运行时使用
+        // 可选：添加 BuildConfig 字段
         buildConfigField("String", "GIT_VERSION", "\"${GitVersions.getVersion(rootDir)}\"")
-        buildConfigField("int", "GIT_COMMIT_COUNT", "${GitVersions.getCommitCount(rootDir)}")
     }
 }
 ```
 
-### 3. 创建 Git 标签
+### Step 4. 创建 Git 标签
 
 ```bash
-# 创建初始版本标签
 git tag -a v1.0.0 -m "Initial release"
-
-# 发布新版本
-git tag -a v1.1.0 -m "Feature: xxx"
 ```
 
 ## 版本号规则
@@ -53,24 +68,15 @@ git tag -a v1.1.0 -m "Feature: xxx"
 |-----|---------|-------------|-------------|
 | 发布版 | 精确在标签 v1.2.3 | `v1.2.3` | `10203` |
 | 开发版 | 标签后 5 次提交 | `v1.2.3-dev.5+abc123` | `10203` |
-| 补丁版 | 标签 v1.2.3-patch-1 | `v1.2.3-patch-1` | `10203` |
-| 无标签 | 仅有 commit | `abc1234` | `1` |
 
-## API 参考
+## API
 
 ```kotlin
 object GitVersions {
-    // 获取版本名称
-    fun getVersion(rootDir: File): String
-
-    // 获取版本代码
-    fun getVersionCode(rootDir: File): Int
-
-    // 获取 Git 提交总数
-    fun getCommitCount(rootDir: File): Int
-
-    // 打印版本信息
-    fun printVersionInfo(rootDir: File)
+    fun getVersion(rootDir: File): String      // 获取版本名
+    fun getVersionCode(rootDir: File): Int     // 获取版本代码
+    fun getCommitCount(rootDir: File): Int     // 获取提交总数
+    fun printVersionInfo(rootDir: File)        // 打印版本信息
 }
 ```
 
@@ -87,4 +93,4 @@ object GitVersions {
 
 ## License
 
-MIT License - 详见 [LICENSE](LICENSE) 文件
+MIT
